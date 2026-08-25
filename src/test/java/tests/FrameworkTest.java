@@ -3,6 +3,7 @@ package tests;
 import base.BaseTest;
 import base.DriverFactory;
 import org.testng.annotations.Test;
+import pages.LoginPage;
 import utilities.ConfigReader;
 
 public class FrameworkTest extends BaseTest {
@@ -17,7 +18,16 @@ public class FrameworkTest extends BaseTest {
         System.out.println(
                 "Page title: " + DriverFactory.getDriver().getTitle()
         );
+
+
+        // Create Login Page object
+        LoginPage loginPage = new LoginPage();
+
+        // Click Login
+        loginPage.clickLogin();
+
         Thread.sleep(150000);
+
         System.out.println("Application opened successfully.");
     }
 }
