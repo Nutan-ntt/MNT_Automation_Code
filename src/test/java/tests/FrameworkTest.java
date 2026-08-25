@@ -18,6 +18,7 @@ public class FrameworkTest extends BaseTest {
                 "Page title: " + DriverFactory.getDriver().getTitle()
         );
         Thread.sleep(150000);
+
         System.out.println("Application opened successfully.");
     }
 }
