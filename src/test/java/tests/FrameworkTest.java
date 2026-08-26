@@ -24,7 +24,7 @@ public class FrameworkTest extends BaseTest {
         LoginPage loginPage = new LoginPage();
 
         // Click Login
-        loginPage.clickLogin();
+        loginPage.loginIfRequired();
 
         Thread.sleep(150000);
 

@@ -20,11 +20,12 @@ public class BaseTest {
         LoginPage loginPage = new LoginPage();
 
         // Click Login
-        loginPage.clickLogin();
+        loginPage.loginIfRequired();;
     }
 
     @AfterMethod
-    public void tearDown() {
-        DriverFactory.quitDriver();
+    public void tearDown()
+    {
+        //DriverFactory.quitDriver();
     }
 }

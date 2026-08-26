@@ -9,40 +9,46 @@ import java.time.Duration;
 
 public class UserManagementPage {
 
-    private By moduleDropdown =
-            By.xpath("//button[contains(normalize-space(), 'COV Main')]");
+    private WebDriverWait wait = new WebDriverWait(
+            DriverFactory.getDriver(),
+            Duration.ofSeconds(15)
+    );
 
-    private By userManagementMenu =
-            By.xpath("//a[@data-testid='dExport' and normalize-space()='User Management']");
+    private By covMainMenu = By.xpath(
+            "//button[contains(@class,'bgnone') and contains(@class,'w100') and contains(normalize-space(.),'COV Main')]"
+    );
 
-    private By userManagementHeading =
-            By.xpath("//h1[normalize-space()='User Management']");
+    private By userManagementLink = By.cssSelector(
+            "a[data-testid='dExport'][href='/user_management']"
+    );
 
-    private WebDriverWait wait =
-            new WebDriverWait(
-                    DriverFactory.getDriver(),
-                    Duration.ofSeconds(20)
-            );
+    private By userManagementHeader = By.xpath(
+            "//h1[normalize-space()='User Management']"
+    );
 
     public void openUserManagement() {
 
         // Click COV Main dropdown
         wait.until(
-                ExpectedConditions.elementToBeClickable(moduleDropdown)
+                ExpectedConditions.elementToBeClickable(covMainMenu)
         ).click();
+
+        System.out.println("COV Main dropdown clicked.");
 
         // Click User Management
         wait.until(
-                ExpectedConditions.elementToBeClickable(userManagementMenu)
+                ExpectedConditions.elementToBeClickable(userManagementLink)
         ).click();
-    }
 
-    public boolean isUserManagementPageDisplayed() {
+        System.out.println("User Management option clicked.");
 
-        return wait.until(
+        // Verify page opened
+        wait.until(
                 ExpectedConditions.visibilityOfElementLocated(
-                        userManagementHeading
+                        userManagementHeader
                 )
-        ).isDisplayed();
+        );
+
+        System.out.println("User Management page opened successfully.");
     }
 }
