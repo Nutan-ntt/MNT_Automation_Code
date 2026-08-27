@@ -18,7 +18,7 @@ public class UserManagementPage {
     );
 
     // ---------------------------------------------------------
-    // Page locators
+    // Navigation
     // ---------------------------------------------------------
 
     private final By covMainMenu = By.xpath(
@@ -35,30 +35,74 @@ public class UserManagementPage {
             "//h1[normalize-space()='User Management']"
     );
 
-    // Search field
+    // ---------------------------------------------------------
+    // Search
+    // ---------------------------------------------------------
+
     private final By nameEmailInput = By.id("nameEmail");
 
-    // Apply button
     private final By applyButton = By.xpath(
             "//button[normalize-space()='Apply']"
     );
 
-    // User rows
+    // ---------------------------------------------------------
+    // Status dropdown
+    // ---------------------------------------------------------
+
+    /*
+     * HTML:
+     *
+     * <div class="input-group">
+     *     <input value="Active">
+     *     <button type="button" ...>
+     *         <button class="p-2 toolTipBlock bgnone">
+     *             <svg>...</svg>
+     *         </button>
+     *     </button>
+     * </div>
+     *
+     * We locate the button containing the SVG path.
+     */
+    private final By statusDropdownButton = By.xpath(
+            "//input[@value='Active']" +
+                    "/following-sibling::button//button[contains(@class,'toolTipBlock')]"
+    );
+
+    /*
+     * All option:
+     *
+     * <button data-rr-ui-event-key="local-All"
+     *         class="border-0 actMenuAuto cursor-pointer list-group-item list-group-item-action">
+     *     All
+     * </button>
+     */
+    private final By allStatusOption = By.xpath(
+            "//button[@data-rr-ui-event-key='local-All' " +
+                    "and normalize-space()='All']"
+    );
+
+    // ---------------------------------------------------------
+    // User table
+    // ---------------------------------------------------------
+
     private final By userRows = By.cssSelector(
             "#grid_container > table#list2 > tbody.tblBodyBlk > tr:not(.nested_row)"
     );
 
-    // More / three-dot button inside a row
+    // Three-dot / More button
     private final By moreButton = By.cssSelector(
             "td.editClmn button"
     );
 
-    // Deactivate option in action menu
+    // ---------------------------------------------------------
+    // Deactivate
+    // ---------------------------------------------------------
+
     private final By deactivateButton = By.xpath(
             "//div[contains(@class,'actionBlock')]//button[normalize-space()='Deactivate']"
     );
 
-    // Confirmation Yes button
+    // Confirmation Yes
     private final By confirmYesButton = By.cssSelector(
             "button.btnOk"
     );
@@ -93,13 +137,357 @@ public class UserManagementPage {
     }
 
     // ---------------------------------------------------------
+    // Search user
+    // ---------------------------------------------------------
+
+    public void searchUser(String userName) {
+
+        WebElement nameInput = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        nameEmailInput
+                )
+        );
+
+        nameInput.clear();
+        nameInput.sendKeys(userName);
+
+        System.out.println(
+                "User search entered: " + userName
+        );
+
+        clickApplyButton();
+
+        System.out.println("Apply button clicked.");
+    }
+
+    // ---------------------------------------------------------
+    // Click Apply
+    // ---------------------------------------------------------
+
+    private void clickApplyButton() {
+
+        WebElement apply = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        applyButton
+                )
+        );
+
+        scrollIntoView(apply);
+
+        try {
+
+            apply.click();
+
+        } catch (ElementClickInterceptedException e) {
+
+            System.out.println(
+                    "Apply click intercepted. Using JavaScript click."
+            );
+
+            ((JavascriptExecutor) DriverFactory.getDriver())
+                    .executeScript(
+                            "arguments[0].click();",
+                            apply
+                    );
+        }
+
+        /*
+         * DO NOT use stalenessOf(apply) here.
+         *
+         * The application does not replace the Apply button
+         * after clicking it.
+         *
+         * Instead, wait until the table has finished updating.
+         */
+        wait.until(
+                ExpectedConditions.presenceOfAllElementsLocatedBy(
+                        userRows
+                )
+        );
+    }
+
+    // ---------------------------------------------------------
+    // Change status filter to ALL
+    // ---------------------------------------------------------
+
+    public void selectAllStatus() {
+
+        System.out.println(
+                "Changing status filter from Active to All."
+        );
+
+        WebElement dropdown = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        statusDropdownButton
+                )
+        );
+
+        scrollIntoView(dropdown);
+
+        try {
+
+            dropdown.click();
+
+        } catch (ElementClickInterceptedException e) {
+
+            System.out.println(
+                    "Status dropdown click intercepted. " +
+                            "Using JavaScript click."
+            );
+
+            ((JavascriptExecutor) DriverFactory.getDriver())
+                    .executeScript(
+                            "arguments[0].click();",
+                            dropdown
+                    );
+        }
+
+        System.out.println(
+                "Status dropdown opened."
+        );
+
+        WebElement allOption = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        allStatusOption
+                )
+        );
+
+        try {
+
+            allOption.click();
+
+        } catch (ElementClickInterceptedException e) {
+
+            System.out.println(
+                    "All option click intercepted. " +
+                            "Using JavaScript click."
+            );
+
+            ((JavascriptExecutor) DriverFactory.getDriver())
+                    .executeScript(
+                            "arguments[0].click();",
+                            allOption
+                    );
+        }
+
+        System.out.println(
+                "Status filter changed to All."
+        );
+    }
+
+    // ---------------------------------------------------------
+    // Search user with ALL status
+    // ---------------------------------------------------------
+
+    public void searchUserInAllStatus(String userName) {
+
+        System.out.println(
+                "Searching for user in ALL status: " + userName
+        );
+
+        selectAllStatus();
+
+        /*
+         * Click Apply after changing status.
+         */
+        clickApplyButton();
+
+        System.out.println(
+                "Apply clicked with status filter = All."
+        );
+
+        /*
+         * Now wait for the requested user to appear.
+         */
+        getUserRow(userName);
+
+        System.out.println(
+                "User found with ALL status: " + userName
+        );
+    }
+
+    // ---------------------------------------------------------
+    // Find specific user row
+    // ---------------------------------------------------------
+
+    private WebElement getUserRow(String userName) {
+
+        /*
+         * contains() is used so this works even if the cell
+         * contains additional whitespace or child elements.
+         *
+         * Example:
+         *
+         * <td class="um_name">
+         *     <span>rama1</span>
+         * </td>
+         */
+        String escapedUserName = escapeXPath(userName);
+
+        By userRow = By.xpath(
+                "//table[@id='list2']" +
+                        "//tbody[contains(@class,'tblBodyBlk')]" +
+                        "/tr[not(contains(@class,'nested_row'))]" +
+                        "[.//td[contains(@class,'um_name') " +
+                        "and contains(normalize-space(.), " +
+                        escapedUserName +
+                        ")]]"
+        );
+
+        return wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        userRow
+                )
+        );
+    }
+
+    // ---------------------------------------------------------
+    // Deactivate user
+    // ---------------------------------------------------------
+
+    public void deactivateUser(String userName) {
+
+        WebElement userRow = getUserRow(userName);
+
+        System.out.println(
+                "User found: " + userRow.getText()
+        );
+
+        // Scroll row into view
+        scrollIntoView(userRow);
+
+        /*
+         * IMPORTANT:
+         *
+         * Find the three-dot button INSIDE this particular row.
+         */
+        WebElement moreButtonElement = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        userRow.findElement(moreButton)
+                )
+        );
+
+        System.out.println(
+                "Three-dot button located."
+        );
+
+        try {
+
+            moreButtonElement.click();
+
+        } catch (ElementClickInterceptedException e) {
+
+            System.out.println(
+                    "Three-dot click intercepted. " +
+                            "Using JavaScript click."
+            );
+
+            ((JavascriptExecutor) DriverFactory.getDriver())
+                    .executeScript(
+                            "arguments[0].click();",
+                            moreButtonElement
+                    );
+        }
+
+        System.out.println(
+                "More button clicked."
+        );
+
+        // -----------------------------------------------------
+        // Click Deactivate
+        // -----------------------------------------------------
+
+        WebElement deactivate = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        deactivateButton
+                )
+        );
+
+        try {
+
+            deactivate.click();
+
+        } catch (ElementClickInterceptedException e) {
+
+            System.out.println(
+                    "Deactivate click intercepted. " +
+                            "Using JavaScript click."
+            );
+
+            ((JavascriptExecutor) DriverFactory.getDriver())
+                    .executeScript(
+                            "arguments[0].click();",
+                            deactivate
+                    );
+        }
+
+        System.out.println(
+                "Deactivate option clicked."
+        );
+
+        // -----------------------------------------------------
+        // Confirm
+        // -----------------------------------------------------
+
+        WebElement confirmYes = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        confirmYesButton
+                )
+        );
+
+        try {
+
+            confirmYes.click();
+
+        } catch (ElementClickInterceptedException e) {
+
+            System.out.println(
+                    "Confirmation click intercepted. " +
+                            "Using JavaScript click."
+            );
+
+            ((JavascriptExecutor) DriverFactory.getDriver())
+                    .executeScript(
+                            "arguments[0].click();",
+                            confirmYes
+                    );
+        }
+
+        System.out.println(
+                "Deactivate confirmation accepted."
+        );
+    }
+
+    // ---------------------------------------------------------
+    // Get User Status
+    // ---------------------------------------------------------
+
+    public String getUserStatus(String userName) {
+
+        WebElement userRow = getUserRow(userName);
+
+        String status = userRow.findElement(
+                By.cssSelector("td.um_status")
+        ).getText().trim();
+
+        System.out.println(
+                "User '" + userName +
+                        "' current status: " + status
+        );
+
+        return status;
+    }
+
+    // ---------------------------------------------------------
     // Verify users displayed
     // ---------------------------------------------------------
 
     public boolean areUsersDisplayed() {
 
         return !wait.until(
-                ExpectedConditions.presenceOfAllElementsLocatedBy(userRows)
+                ExpectedConditions.presenceOfAllElementsLocatedBy(
+                        userRows
+                )
         ).isEmpty();
     }
 
@@ -121,7 +509,7 @@ public class UserManagementPage {
     }
 
     // ---------------------------------------------------------
-    // Verify first user data
+    // First user data
     // ---------------------------------------------------------
 
     public boolean isFirstUserDataDisplayed() {
@@ -129,7 +517,9 @@ public class UserManagementPage {
         try {
 
             WebElement firstRow = wait.until(
-                    ExpectedConditions.visibilityOfElementLocated(userRows)
+                    ExpectedConditions.visibilityOfElementLocated(
+                            userRows
+                    )
             );
 
             String userName = firstRow.findElement(
@@ -155,7 +545,9 @@ public class UserManagementPage {
     public String getFirstUserName() {
 
         WebElement firstRow = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(userRows)
+                ExpectedConditions.visibilityOfElementLocated(
+                        userRows
+                )
         );
 
         return firstRow.findElement(
@@ -164,230 +556,50 @@ public class UserManagementPage {
     }
 
     // ---------------------------------------------------------
-    // Search user
+    // Scroll helper
     // ---------------------------------------------------------
 
-    public void searchUser(String userName) {
+    private void scrollIntoView(WebElement element) {
 
-        WebElement nameInput = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(
-                        nameEmailInput
-                )
-        );
-
-        nameInput.clear();
-        nameInput.sendKeys(userName);
-
-        System.out.println(
-                "User search entered: " + userName
-        );
-
-        // Find Apply button
-        WebElement apply = wait.until(
-                ExpectedConditions.presenceOfElementLocated(
-                        applyButton
-                )
-        );
-
-        // Scroll Apply button into center of viewport
         ((JavascriptExecutor) DriverFactory.getDriver())
                 .executeScript(
-                        "arguments[0].scrollIntoView({block:'center', inline:'center'});",
-                        apply
+                        "arguments[0].scrollIntoView(" +
+                                "{block:'center', inline:'center'});",
+                        element
                 );
-
-        // Allow UI/layout to settle
-        try {
-
-            Thread.sleep(500);
-
-        } catch (InterruptedException e) {
-
-            Thread.currentThread().interrupt();
-        }
-
-        try {
-
-            wait.until(
-                    ExpectedConditions.elementToBeClickable(
-                            apply
-                    )
-            );
-
-            apply.click();
-
-        } catch (ElementClickInterceptedException e) {
-
-            System.out.println(
-                    "Apply button click intercepted. Using JavaScript click."
-            );
-
-            ((JavascriptExecutor) DriverFactory.getDriver())
-                    .executeScript(
-                            "arguments[0].click();",
-                            apply
-                    );
-        }
-
-        System.out.println(
-                "Apply button clicked."
-        );
     }
 
     // ---------------------------------------------------------
-    // Find specific user row
+    // XPath string helper
     // ---------------------------------------------------------
 
-    private WebElement getUserRow(String userName) {
+    private String escapeXPath(String value) {
 
-        /*
-         * Find the TR which contains a td.um_name
-         * whose text contains the supplied userName.
-         *
-         * Example:
-         *
-         * Search = rama1
-         *
-         * Actual displayed name =
-         * rama1 rama2 rama2
-         *
-         * contains() will still find the correct row.
-         */
-
-        By userRow = By.xpath(
-                "//table[@id='list2']" +
-                        "//tbody[contains(@class,'tblBodyBlk')]" +
-                        "/tr[not(contains(@class,'nested_row'))]" +
-                        "[.//td[contains(@class,'um_name')" +
-                        " and contains(normalize-space(.),'" +
-                        userName +
-                        "')]]"
-        );
-
-        return wait.until(
-                ExpectedConditions.visibilityOfElementLocated(
-                        userRow
-                )
-        );
-    }
-
-    // ---------------------------------------------------------
-    // Deactivate user
-    // ---------------------------------------------------------
-
-    public void deactivateUser(String userName) {
-
-        WebElement userRow = getUserRow(userName);
-
-        System.out.println(
-                "User found: " + userRow.getText()
-        );
-
-        // Scroll the user row into the center of the screen
-        ((JavascriptExecutor) DriverFactory.getDriver())
-                .executeScript(
-                        "arguments[0].scrollIntoView({block:'center', inline:'center'});",
-                        userRow
-                );
-
-        // -----------------------------------------------------
-        // Find three-dot button inside THIS user's row
-        // -----------------------------------------------------
-
-        WebElement moreButtonElement = wait.until(
-                ExpectedConditions.visibilityOf(
-                        userRow.findElement(moreButton)
-                )
-        );
-
-        System.out.println(
-                "Three-dot button located."
-        );
-
-        // Scroll the three-dot button into view
-        ((JavascriptExecutor) DriverFactory.getDriver())
-                .executeScript(
-                        "arguments[0].scrollIntoView({block:'center', inline:'center'});",
-                        moreButtonElement
-                );
-
-        try {
-
-            // Wait until clickable
-            wait.until(
-                    ExpectedConditions.elementToBeClickable(
-                            moreButtonElement
-                    )
-            );
-
-            moreButtonElement.click();
-
-        } catch (ElementClickInterceptedException e) {
-
-            System.out.println(
-                    "Three-dot click intercepted. Using JavaScript click."
-            );
-
-            ((JavascriptExecutor) DriverFactory.getDriver())
-                    .executeScript(
-                            "arguments[0].click();",
-                            moreButtonElement
-                    );
+        if (!value.contains("'")) {
+            return "'" + value + "'";
         }
 
-        System.out.println(
-                "More button clicked."
-        );
+        if (!value.contains("\"")) {
+            return "\"" + value + "\"";
+        }
 
-        // -----------------------------------------------------
-        // Click Deactivate
-        // -----------------------------------------------------
+        String[] parts = value.split("'");
 
-        WebElement deactivate = wait.until(
-                ExpectedConditions.elementToBeClickable(
-                        deactivateButton
-                )
-        );
+        StringBuilder result = new StringBuilder("concat(");
 
-        deactivate.click();
+        for (int i = 0; i < parts.length; i++) {
 
-        System.out.println(
-                "Deactivate option clicked."
-        );
+            if (i > 0) {
+                result.append(", \"'\", ");
+            }
 
-        // -----------------------------------------------------
-        // Confirm Yes
-        // -----------------------------------------------------
+            result.append("'")
+                    .append(parts[i])
+                    .append("'");
+        }
 
-        WebElement confirmYes = wait.until(
-                ExpectedConditions.elementToBeClickable(
-                        confirmYesButton
-                )
-        );
+        result.append(")");
 
-        confirmYes.click();
-
-        System.out.println(
-                "Deactivate confirmation accepted."
-        );
-    }
-
-    // ---------------------------------------------------------
-    // Get user status
-    // ---------------------------------------------------------
-
-    public String getUserStatus(String userName) {
-
-        WebElement userRow = getUserRow(userName);
-
-        String status = userRow.findElement(
-                By.cssSelector("td.um_status")
-        ).getText().trim();
-
-        System.out.println(
-                "User status for " + userName + ": " + status
-        );
-
-        return status;
+        return result.toString();
     }
 }

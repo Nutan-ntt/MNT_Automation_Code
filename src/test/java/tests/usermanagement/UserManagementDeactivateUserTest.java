@@ -9,27 +9,23 @@ public class UserManagementDeactivateUserTest extends BaseTest {
     @Test
     public void verifyAdminCanDeactivateUser() {
 
-        // ---------------------------------------------------------
-        // Test data
-        // ---------------------------------------------------------
-
         String userName = "rama1";
 
-        // ---------------------------------------------------------
+        // -----------------------------------------------------
         // Open User Management
-        // ---------------------------------------------------------
+        // -----------------------------------------------------
 
         userManagementPage.openUserManagement();
 
-        // ---------------------------------------------------------
-        // Search for user
-        // ---------------------------------------------------------
+        // -----------------------------------------------------
+        // Search active user
+        // -----------------------------------------------------
 
         userManagementPage.searchUser(userName);
 
-        // ---------------------------------------------------------
-        // Verify user is found and get current status
-        // ---------------------------------------------------------
+        // -----------------------------------------------------
+        // Verify user is currently Active
+        // -----------------------------------------------------
 
         String statusBefore =
                 userManagementPage.getUserStatus(userName);
@@ -38,21 +34,32 @@ public class UserManagementDeactivateUserTest extends BaseTest {
                 "Status before deactivation: " + statusBefore
         );
 
-        // Make sure the user was actually found
-        Assert.assertNotNull(
+        Assert.assertEquals(
                 statusBefore,
-                "User status should not be null."
+                "Active",
+                "User should be Active before deactivation."
         );
 
-        // ---------------------------------------------------------
+        // -----------------------------------------------------
         // Deactivate user
-        // ---------------------------------------------------------
+        // -----------------------------------------------------
 
         userManagementPage.deactivateUser(userName);
 
-        // ---------------------------------------------------------
-        // Verify status after deactivation
-        // ---------------------------------------------------------
+        // -----------------------------------------------------
+        // IMPORTANT:
+        //
+        // After deactivation the default filter is still
+        // Active, so rama1 will disappear.
+        //
+        // Change filter to ALL and search again.
+        // -----------------------------------------------------
+
+        userManagementPage.searchUserInAllStatus(userName);
+
+        // -----------------------------------------------------
+        // Verify status
+        // -----------------------------------------------------
 
         String statusAfter =
                 userManagementPage.getUserStatus(userName);
@@ -61,14 +68,15 @@ public class UserManagementDeactivateUserTest extends BaseTest {
                 "Status after deactivation: " + statusAfter
         );
 
-        // ---------------------------------------------------------
-        // Assertion
-        // ---------------------------------------------------------
-
         Assert.assertEquals(
                 statusAfter,
                 "Inactive",
                 "User was not deactivated successfully."
+        );
+
+        System.out.println(
+                "User " + userName +
+                        " successfully deactivated."
         );
     }
 }
