@@ -6,7 +6,9 @@ import org.testng.annotations.Test;
 
 public class UserManagementUserDataTest extends BaseTest {
 
-    @Test
+    @Test(
+            description = "Verify user management module is accessible and users data is displayed"
+    )
     public void verifyUserDataIsDisplayed() {
 
         userManagementPage.openUserManagement();

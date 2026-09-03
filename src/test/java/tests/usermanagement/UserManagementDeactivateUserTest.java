@@ -6,7 +6,9 @@ import org.testng.annotations.Test;
 
 public class UserManagementDeactivateUserTest extends BaseTest {
 
-    @Test
+    @Test(
+            description = "Verify Admin can deactivate the user and an inactive user should not be able to login to the portal,if logged in should be logged out immediately"
+    )
     public void verifyAdminCanDeactivateUser() {
 
         String userName = "rama1";

@@ -6,7 +6,9 @@ import pages.usermanagement.UserManagementPage;
 
 public class UserManagementAccessTest extends BaseTest {
 
-    @Test
+    @Test(
+            description = "Verify Admin can access user management module and non admin users should not"
+    )
     public void verifyAdminCanAccessUserManagement() {
 
         UserManagementPage userManagementPage =

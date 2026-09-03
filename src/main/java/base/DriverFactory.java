@@ -10,6 +10,13 @@ public class DriverFactory {
 
     public static void initializeDriver() {
 
+        // Suppress Selenium CDP version warning
+        java.util.logging.Logger.getLogger(
+                "org.openqa.selenium.devtools.CdpVersionFinder"
+        ).setLevel(
+                java.util.logging.Level.OFF
+        );
+
         ChromeOptions options = new ChromeOptions();
 
         options.addArguments("--disable-gpu");

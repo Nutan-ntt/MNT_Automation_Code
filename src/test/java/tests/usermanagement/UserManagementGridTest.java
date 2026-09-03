@@ -7,7 +7,9 @@ import pages.usermanagement.UserManagementPage;
 
 public class UserManagementGridTest extends BaseTest {
 
-    @Test
+    @Test(
+            description = "Verify user management grid contents"
+    )
     public void verifyUserManagementGridDisplaysUsers() {
 
         UserManagementPage userManagementPage =
