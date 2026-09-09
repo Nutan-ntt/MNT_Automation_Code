@@ -14,13 +14,17 @@
 
         <classes>
 
+            <class name="tests.usermanagement.UserManagementAccessTest"/>
+
             <class name="tests.usermanagement.UserManagementGridTest"/>
 
             <class name="tests.usermanagement.UserManagementUserDataTest"/>
 
-            <class name="tests.usermanagement.UserManagementAccessTest"/>
-
             <class name="tests.usermanagement.CreateUserTest"/>
+
+            <class name="tests.usermanagement.EditUserTest"/>
+
+            <class name="tests.usermanagement.UserModifyPermissionTest"/>
 
             <class name="tests.usermanagement.UserManagementDeactivateUserTest"/>
 

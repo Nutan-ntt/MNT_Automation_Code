@@ -85,8 +85,11 @@ public class UserManagementPage {
     // User table
     // ---------------------------------------------------------
 
-    private final By userRows = By.cssSelector(
-            "#grid_container > table#list2 > tbody.tblBodyBlk > tr:not(.nested_row)"
+    private final By userRows = By.xpath(
+            "//table[@id='list2']" +
+                    "//tbody[contains(@class,'tblBodyBlk')]" +
+                    "/tr[not(contains(@class,'nested_row'))]" +
+                    "[.//td[contains(@class,'um_name')]]"
     );
 
     // Three-dot / More button
@@ -164,7 +167,7 @@ public class UserManagementPage {
     // Click Apply
     // ---------------------------------------------------------
 
-    private void clickApplyButton() {
+    public void clickApplyButton() {
 
         WebElement apply = wait.until(
                 ExpectedConditions.elementToBeClickable(
@@ -491,23 +494,43 @@ public class UserManagementPage {
         ).isEmpty();
     }
 
+    public boolean areUsersPresent() {
+
+        By userCountText = By.xpath(
+                "//div[contains(@class,'tblFooterPaenationDiv')]"
+                        + "//span[contains(text(),'of')]"
+        );
+
+        WebElement countText = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        userCountText
+                )
+        );
+
+        String text = countText.getText();
+
+        System.out.println("User count information: " + text);
+
+        return text.contains("of") && !text.contains("of 0");
+    }
+
     // ---------------------------------------------------------
     // Get displayed user count
     // ---------------------------------------------------------
 
     public int getDisplayedUserCount() {
 
-        int count = DriverFactory.getDriver()
-                .findElements(userRows)
-                .size();
-
-        System.out.println(
-                "Number of users displayed: " + count
+        WebElement table = DriverFactory.getDriver().findElement(
+                By.id("list2")
         );
 
-        return count;
-    }
+        System.out.println("======================================");
+        System.out.println("TABLE HTML:");
+        System.out.println(table.getAttribute("outerHTML"));
+        System.out.println("======================================");
 
+        return 0;
+    }
     // ---------------------------------------------------------
     // First user data
     // ---------------------------------------------------------

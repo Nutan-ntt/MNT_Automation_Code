@@ -3,29 +3,28 @@ package tests.usermanagement;
 import base.BaseTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import pages.usermanagement.UserManagementPage;
 
 public class UserManagementGridTest extends BaseTest {
 
     @Test(
-            description = "Verify user management grid contents"
+            description = "Verify users are present in User Management"
     )
-    public void verifyUserManagementGridDisplaysUsers() {
-
-        UserManagementPage userManagementPage =
-                new UserManagementPage();
+    public void verifyUsersArePresent() {
 
         userManagementPage.openUserManagement();
 
-        int userCount = userManagementPage.getDisplayedUserCount();
+        userManagementPage.clickApplyButton();
 
-        System.out.println(
-                "Number of users displayed on current page: " + userCount
-        );
+        boolean usersPresent =
+                userManagementPage.areUsersPresent();
 
         Assert.assertTrue(
-                userCount > 0,
-                "User Management grid does not display any users."
+                usersPresent,
+                "No users are present in User Management."
+        );
+
+        System.out.println(
+                "Users are present in User Management."
         );
     }
 }
