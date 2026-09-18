@@ -3,6 +3,8 @@ package base;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 
 public class DriverFactory {
 
@@ -18,6 +20,7 @@ public class DriverFactory {
         );
 
         ChromeOptions options = new ChromeOptions();
+        //EdgeOptions options = new EdgeOptions();
 
         options.addArguments("--disable-gpu");
         options.addArguments("--disable-extensions");
@@ -27,8 +30,10 @@ public class DriverFactory {
 
         // Use a separate Chrome profile for automation
         options.addArguments("--user-data-dir=C:\\SeleniumChromeProfile");
+        //options.addArguments("--user-data-dir=C:\\SeleniumEdgeProfile");
 
         driver = new ChromeDriver(options);
+        //driver = new EdgeDriver(options);
 
         driver.manage().window().maximize();
     }

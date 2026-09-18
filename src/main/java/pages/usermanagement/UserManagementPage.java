@@ -12,7 +12,7 @@ import java.time.Duration;
 
 public class UserManagementPage {
 
-    private final WebDriverWait wait = new WebDriverWait(
+    public final WebDriverWait wait = new WebDriverWait(
             DriverFactory.getDriver(),
             Duration.ofSeconds(15)
     );
