@@ -1,6 +1,7 @@
 package base;
 
-import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeMethod;
 import pages.LoginPage;
 import pages.usermanagement.UserManagementPage;
@@ -9,26 +10,27 @@ import utilities.ConfigReader;
 public class BaseTest {
 
     protected UserManagementPage userManagementPage;
-    @BeforeMethod
-    public void setUp() {
+    private static boolean sessionInitialized;
 
+    @BeforeSuite
+    public void startBrowser() {
         DriverFactory.initializeDriver();
-        userManagementPage = new UserManagementPage();
-
-        DriverFactory.getDriver().get(
-                ConfigReader.getProperty("application.url")
-        );
-
-        // Create Login Page object
-        LoginPage loginPage = new LoginPage();
-
-        // Click Login
-        loginPage.loginIfRequired();;
+        if (!sessionInitialized) {
+            DriverFactory.getDriver().get(
+                    ConfigReader.getProperty("application.url")
+            );
+            new LoginPage().loginIfRequired();
+            sessionInitialized = true;
+        }
     }
 
-    @AfterMethod
-    public void tearDown()
-    {
-        //DriverFactory.quitDriver();
+    @BeforeMethod
+    public void setUp() {
+        userManagementPage = new UserManagementPage();
+    }
+
+    @AfterSuite
+    public void tearDown() {
+        DriverFactory.quitDriver();
     }
 }

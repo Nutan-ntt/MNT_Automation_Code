@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="COV Files Suite" preserve-order="true">
+    <listeners>
+        <listener class-name="listeners.TestResultListener"/>
+    </listeners>
+
+    <test name="COV Files Tests">
+        <classes>
+            <class name="tests.CovFiles.CovFilesUploadTest"/>
+            <class name="tests.CovFiles.CovSearchFilesTest"/>
+            <class name="tests.CovFiles.CovDownloadFileTest"/>
+            <class name="tests.CovFiles.CovEditEmailIDTest"/>
+            <class name="tests.CovFiles.CovViewDetailsTest"/>
+            <class name="tests.CovFiles.CovExpandSearchbookingIDTest"/>
+        </classes>
+    </test>
+</suite>

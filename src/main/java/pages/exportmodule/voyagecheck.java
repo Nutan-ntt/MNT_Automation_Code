@@ -90,6 +90,9 @@ public class voyagecheck {
     private final By searchButton = By.xpath(
             "//button[@type='button' and normalize-space()='Search']"
     );
+    private final By parametersButton = By.xpath(
+            "//button[normalize-space()='Parameters']"
+    );
 
     public void searchVoyage(String voyageNumber) {
 
@@ -118,6 +121,9 @@ public class voyagecheck {
         }
 
         System.out.println("10 seconds wait completed. Results should be loaded.");
+
+        wait.until(ExpectedConditions.elementToBeClickable(parametersButton)).click();
+        System.out.println("Parameters opened.");
     }
 
     private final By resultCheckbox = By.xpath(

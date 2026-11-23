@@ -23,7 +23,6 @@ public class UserManagementPage {
 
     private final By covMainMenu = By.xpath(
             "//button[contains(@class,'bgnone') " +
-                    "and contains(@class,'w100') " +
                     "and contains(normalize-space(.),'COV Main')]"
     );
 

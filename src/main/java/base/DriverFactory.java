@@ -6,11 +6,18 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
 public class DriverFactory {
 
     private static WebDriver driver;
 
     public static void initializeDriver() {
+        if (driver != null) {
+            return;
+        }
 
         // Suppress Selenium CDP version warning
         java.util.logging.Logger.getLogger(
@@ -28,9 +35,14 @@ public class DriverFactory {
         options.addArguments("--no-sandbox");
         options.setAcceptInsecureCerts(true);
 
-        // Use a separate Chrome profile for automation
-        options.addArguments("--user-data-dir=C:\\SeleniumChromeProfile");
-        //options.addArguments("--user-data-dir=C:\\SeleniumEdgeProfile");
+        Map<String, Object> preferences = new HashMap<>();
+        preferences.put(
+                "download.default_directory",
+                Paths.get(System.getProperty("user.home"), "Downloads").toString()
+        );
+        preferences.put("download.prompt_for_download", false);
+        preferences.put("download.directory_upgrade", true);
+        options.setExperimentalOption("prefs", preferences);
 
         driver = new ChromeDriver(options);
         //driver = new EdgeDriver(options);

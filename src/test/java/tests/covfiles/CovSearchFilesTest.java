@@ -1,4 +1,4 @@
-package tests.covfiles;
+package tests.CovFiles;
 
 import base.BaseTest;
 import org.testng.annotations.Test;

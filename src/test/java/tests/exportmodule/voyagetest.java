@@ -14,8 +14,6 @@ public class voyagetest extends BaseTest {
         export.openExportModule();
         export.changeCountryToVN();
 
-        export.searchVoyage("0B71PN1MA");
-
-        export.selectResultAndSendReminder();
+        export.searchVoyage("0B727N1MA");
     }
 }
